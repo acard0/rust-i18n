@@ -3,30 +3,29 @@ authors = ["Jason Lee <huacnlee@gmail.com>"]
 build = "build.rs"
 categories = ["localization", "internationalization"]
 description = "Rust I18n is use Rust codegen for load YAML file storage translations on compile time, and give you a t! macro for simply get translation texts."
-edition = "2018"
+edition = "2021"
 exclude = ["crates", "tests"]
 keywords = ["i18n", "yml", "localization", "internationalization"]
 license = "MIT"
 name = "rust-i18n"
 readme = "README.md"
 repository = "https://github.com/longbridgeapp/rust-i18n"
-version = "2.0.1-alpha.0"
+version = "2.0.1-x"
 
 [dependencies]
+rust-i18n-extract = {path = "./crates/extract", optional = true}
+rust-i18n-support = {path = "./crates/support"}
+rust-i18n-macro = {path = "./crates/macro"}
 anyhow = {version = "1", optional = true}
-clap = {version = "2.32", optional = true}
-itertools = {version = "0.10.3", optional = true}
+clap = {version = "4.3", optional = true, features = ["cargo"]}
+itertools = {version = "0.11.0", optional = true}
 once_cell = "1.10.0"
 quote = {version = "1", optional = true}
-rust-i18n-extract = {path = "./crates/extract", version = "2.0.0", optional = true}
-rust-i18n-support = {path = "./crates/support", version = "2.0.0"}
-rust-i18n-macro = {path = "./crates/macro", version = "2.0.0"}
 serde = "1"
 serde_derive = "1"
-toml = "0.5.8"
+toml = "0.7"
 
 [dev-dependencies]
-foo = {path = "examples/foo"}
 criterion = "0.5"
 lazy_static = "1"
 
@@ -36,10 +35,6 @@ default = ["rust-i18n-extract", "clap", "anyhow", "quote", "itertools"]
 [build-dependencies]
 globwalk = "0.8.1"
 regex = "1"
-
-[[example]]
-name = "app"
-test = true
 
 [[bin]]
 name = "cargo-i18n"
@@ -51,10 +46,5 @@ members = [
     "crates/extract",
     "crates/support",
     "crates/macro",
-    "examples/app-load-path",
-    "examples/foo",
+    "tests"
 ]
-
-[[bench]]
-harness = false
-name = "bench"

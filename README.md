@@ -1,3 +1,17 @@
+overloads
+```rs
+t!("foo", locale = "en", "bar", "baz")
+t!("foo", locale = "en", vec!["bar", "baz"])
+t!("foo", vec!["bar", "baz"])
+t!("foo", "bar", "baz")
+```
+
+runtime translation
+```rs
+t_add!("en", "messages.welcome", "Welcome {0}")
+t_add!("messages.welcome", "Welcome {0}")
+```
+
 # Rust I18n
 
 [![CI](https://github.com/longbridgeapp/rust-i18n/actions/workflows/ci.yml/badge.svg)](https://github.com/longbridgeapp/rust-i18n/actions/workflows/ci.yml) [![Docs](https://docs.rs/rust-i18n/badge.svg)](https://docs.rs/rust-i18n/) [![Crates.io](https://img.shields.io/crates/v/rust-i18n.svg)](https://crates.io/crates/rust-i18n)

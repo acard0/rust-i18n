@@ -1,0 +1,6 @@
+greetings: Greetings!
+test_of: Test of {0} and {1}
+hello: Hello
+hellox: Hello {0}
+messages:
+  hello: Hello

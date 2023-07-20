@@ -1,5 +1,0 @@
-[workspace]
-members = [
-  "app1",
-  "crates/example-base",
-]

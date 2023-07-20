@@ -7,9 +7,13 @@ use std::sync::Mutex;
 #[doc(hidden)]
 pub use once_cell;
 pub use rust_i18n_macro::i18n;
-pub use rust_i18n_support::{Backend, BackendExt, SimpleBackend};
+pub use rust_i18n_support::{get_locale, Backend, BackendExt, SimpleBackend};
 
-static CURRENT_LOCALE: Lazy<Mutex<String>> = Lazy::new(|| Mutex::new(String::from("en")));
+static CURRENT_LOCALE: Lazy<Mutex<String>> = Lazy::new(|| {
+    get_locale()
+        .map(|locale| Mutex::new(locale.to_string()))
+        .unwrap_or_else(|| Mutex::new("en-US".to_string()))
+});
 
 /// Set current locale
 pub fn set_locale(locale: &str) {
@@ -20,6 +24,20 @@ pub fn set_locale(locale: &str) {
 /// Get current locale
 pub fn locale() -> String {
     CURRENT_LOCALE.lock().unwrap().to_string()
+}
+
+pub fn fmt<I, S>(s: &str, vals: I) -> String
+where
+    I: IntoIterator<Item = S>,
+    S: AsRef<str>,
+{
+    let mut res = s.to_string();
+    for (i, val) in vals.into_iter().enumerate() {
+        let placeholder = format!("{{{}}}", i);
+        res = res.replace(&placeholder, val.as_ref());
+    }
+
+    res
 }
 
 /// Get I18n text
@@ -42,18 +60,31 @@ pub fn locale() -> String {
 macro_rules! t {
     // t!("foo")
     ($key:expr) => {
-        crate::_rust_i18n_translate(rust_i18n::locale().as_str(), $key)
+        _rust_i18n_translate(rust_i18n::locale().as_str(), $key)
     };
+
+    // t!("foo", locale = "en", vec!["bar", "baz"])
+    ($key:expr, locale = $locale:expr, $vals:expr) => {{
+        let mut message = _rust_i18n_translate($locale, $key);
+        rust_i18n::fmt(&message, $vals)
+    }};
+
+    // t!("foo", locale = "en", "bar", "baz")
+    ($key:expr, locale = $locale:expr, $( $x:expr ),*) => {{
+        let mut message = _rust_i18n_translate($locale, $key);
+        let vals: Vec<&str> = vec![$($x),*];
+        rust_i18n::fmt(&message, &vals)
+    }};
 
     // t!("foo", locale = "en")
     ($key:expr, locale = $locale:expr) => {
-        crate::_rust_i18n_translate($locale, $key)
+        _rust_i18n_translate($locale, $key)
     };
 
     // t!("foo", locale = "en", a = 1, b = "Foo")
     ($key:expr, locale = $locale:expr, $($var_name:tt = $var_val:expr),+ $(,)?) => {
         {
-            let mut message = crate::_rust_i18n_translate($locale, $key);
+            let mut message = _rust_i18n_translate($locale, $key);
 
             $(
                 // Get the variable name as a string, and remove quotes surrounding the variable name
@@ -70,23 +101,41 @@ macro_rules! t {
     // t!("foo %{a} %{b}", a = "bar", b = "baz")
     ($key:expr, $($var_name:tt = $var_val:expr),+ $(,)?) => {
         {
-            t!($key, locale = &rust_i18n::locale(), $($var_name = $var_val),*)
+            rust_i18n::t!($key, locale = &rust_i18n::locale(), $($var_name = $var_val),*)
         }
     };
 
     // t!("foo %{a} %{b}", locale = "en", "a" => "bar", "b" => "baz")
     ($key:expr, locale = $locale:expr, $($var_name:tt => $var_val:expr),+ $(,)?) => {
         {
-            t!($key, locale = $locale, $($var_name = $var_val),*)
+            rust_i18n::t!($key, locale = $locale, $($var_name = $var_val),*)
         }
     };
 
     // t!("foo %{a} %{b}", "a" => "bar", "b" => "baz")
     ($key:expr, $($var_name:tt => $var_val:expr),+ $(,)?) => {
         {
-            t!($key, locale = &rust_i18n::locale(), $($var_name = $var_val),*)
+            rust_i18n::t!($key, locale = &rust_i18n::locale(), $($var_name = $var_val),*)
         }
     };
+
+    // t!("foo", vec!["bar", "baz"])
+    ($key:expr, $vals:expr) => {{
+        rust_i18n::t!(
+            $key,
+            locale = rust_i18n::locale().as_str(),
+            $vals
+        )
+    }};
+    
+    // t!("foo", "bar", "baz")
+    ($key:expr, $( $x:expr ),*) => {{
+        rust_i18n::t!(
+            $key,
+            locale = rust_i18n::locale().as_str(),
+            vec![$($x),*]
+        )
+    }};
 }
 
 /// Get available locales
@@ -99,6 +148,21 @@ macro_rules! t {
 #[allow(clippy::crate_in_macro_def)]
 macro_rules! available_locales {
     () => {
-        crate::_rust_i18n_available_locales()
+        _rust_i18n_available_locales()
+    };
+}
+
+
+#[macro_export]
+#[allow(clippy::crate_in_macro_def)]
+macro_rules! t_add {
+    // t_add!("en", "messages.welcome", "Welcome %{name}")
+    ($locale:expr, $key:expr, $value:expr) => {
+        _rust_i18n_add($locale, $key, $value)
+    };
+
+    // t_add!("messages.welcome", "Welcome %{name}")
+    ($key:expr, $value:expr) => {
+        _rust_i18n_add(rust_i18n::locale().as_str(), $key, $value)
     };
 }

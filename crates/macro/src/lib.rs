@@ -152,14 +152,15 @@ fn generate_code(
     // result
     quote! {
         use rust_i18n::BackendExt;
+        use std::sync::{Arc, Mutex};
 
         /// I18n backend instance
-        static _RUST_I18N_BACKEND: rust_i18n::once_cell::sync::Lazy<Box<dyn rust_i18n::Backend>> = rust_i18n::once_cell::sync::Lazy::new(|| {
+        static _RUST_I18N_BACKEND: rust_i18n::once_cell::sync::Lazy<Arc<Mutex<Box<dyn rust_i18n::Backend>>>> = rust_i18n::once_cell::sync::Lazy::new(|| {
             let mut backend = rust_i18n::SimpleBackend::new();
             #(#all_translations)*
             #extend_code
 
-            Box::new(backend)
+            Arc::new(Mutex::new(Box::new(backend)))
         });
 
         static _RUST_I18N_FALLBACK_LOCALE: Option<&'static str> = #fallback;
@@ -167,22 +168,30 @@ fn generate_code(
         /// Get I18n text by locale and key
         #[inline]
         pub fn _rust_i18n_translate(locale: &str, key: &str) -> String {
-            if let Some(value) = _RUST_I18N_BACKEND.translate(locale, key) {
+            let mut backend = _RUST_I18N_BACKEND.lock().unwrap();
+
+            if let Some(value) = backend.translate(locale, key) {
                 return value.to_string();
             }
 
-
             if let Some(fallback) = _RUST_I18N_FALLBACK_LOCALE {
-                if let Some(value) = _RUST_I18N_BACKEND.translate(fallback, key) {
+                if let Some(value) = backend.translate(fallback, key) {
                     return value.to_string();
                 }
             }
 
             return format!("{}.{}", locale, key);
         }
+    
+        #[inline]
+        pub fn _rust_i18n_add(locale: &str, key: &str, value: &str) {
+            let mut backend = _RUST_I18N_BACKEND.lock().unwrap();
+            backend.add(locale, key, value);
+        }
 
-        pub fn _rust_i18n_available_locales() -> Vec<&'static str> {
-            let mut locales = _RUST_I18N_BACKEND.available_locales();
+        pub fn _rust_i18n_available_locales() -> Vec<String> {
+            let mut backend = _RUST_I18N_BACKEND.lock().unwrap();
+            let mut locales = backend.available_locales();
             locales.sort();
             locales
         }

@@ -3,9 +3,11 @@ use std::collections::HashMap;
 /// I18n backend trait
 pub trait Backend: Send + Sync + 'static {
     /// Return the available locales
-    fn available_locales(&self) -> Vec<&str>;
+    fn available_locales(&self) -> Vec<String>;
     /// Get the translation for the given locale and key
-    fn translate(&self, locale: &str, key: &str) -> Option<&str>;
+    fn translate(&self, locale: &str, key: &str) -> Option<String>;
+    // Add translation for the given locale and key
+    fn add(&mut self, locale: &str, key: &str, value: &str);
 }
 
 pub trait BackendExt: Backend {
@@ -25,21 +27,26 @@ where
     A: Backend,
     B: Backend,
 {
-    fn available_locales(&self) -> Vec<&str> {
+    fn available_locales(&self) -> Vec<String> {
         let mut available_locales = self.0.available_locales();
         for locale in self.1.available_locales() {
             if !available_locales.contains(&locale) {
                 available_locales.push(locale);
             }
         }
-        available_locales
+        available_locales.clone()
     }
 
     #[inline]
-    fn translate(&self, locale: &str, key: &str) -> Option<&str> {
+    fn translate(&self, locale: &str, key: &str) -> Option<String> {
         self.1
             .translate(locale, key)
             .or_else(|| self.0.translate(locale, key))
+    }
+
+    fn add(&mut self, locale: &str, key: &str, value: &str) {
+        self.0.add(locale, key, value);
+        self.1.add(locale, key, value);
     }
 }
 
@@ -81,22 +88,29 @@ impl SimpleBackend {
 }
 
 impl Backend for SimpleBackend {
-    fn available_locales(&self) -> Vec<&str> {
+    fn available_locales(&self) -> Vec<String> {
         let mut locales = self
             .translations
             .keys()
-            .map(|k| k.as_str())
+            .cloned()
             .collect::<Vec<_>>();
         locales.sort();
         locales
     }
 
-    fn translate(&self, locale: &str, key: &str) -> Option<&str> {
+    fn translate(&self, locale: &str, key: &str) -> Option<String> {
         if let Some(trs) = self.translations.get(locale) {
-            return trs.get(key).map(|s| s.as_str());
+            return trs.get(key).cloned();
         }
 
         None
+    }
+
+    fn add(&mut self, locale: &str, key: &str, value: &str) {
+        let locale = self.translations.entry(locale.to_string())
+            .or_insert_with(HashMap::new);
+
+        locale.insert(key.to_string(), value.to_string());
     }
 }
 
@@ -122,10 +136,10 @@ mod tests {
         data_cn.insert("foo", "Foo 测试");
         backend.add_translations("zh-CN", &data_cn);
 
-        assert_eq!(backend.translate("en", "hello"), Some("Hello"));
-        assert_eq!(backend.translate("en", "foo"), Some("Foo bar"));
-        assert_eq!(backend.translate("zh-CN", "hello"), Some("你好"));
-        assert_eq!(backend.translate("zh-CN", "foo"), Some("Foo 测试"));
+        assert_eq!(backend.translate("en", "hello"), Some("Hello".to_owned()));
+        assert_eq!(backend.translate("en", "foo"), Some("Foo bar".to_owned()));
+        assert_eq!(backend.translate("zh-CN", "hello"), Some("你好".to_owned()));
+        assert_eq!(backend.translate("zh-CN", "foo"), Some("Foo 测试".to_owned()));
 
         assert_eq!(backend.available_locales(), vec!["en", "zh-CN"]);
     }
@@ -149,13 +163,32 @@ mod tests {
         backend2.add_translations("en", &data2);
 
         let mut data_cn2 = HashMap::<&str, &str>::new();
-        data_cn2.insert("hello", "你好2");
+        data_cn2.insert("hello", "你好 2");
         backend2.add_translations("zh-CN", &data_cn2);
 
-        let combined = backend.extend(backend2);
-        assert_eq!(combined.translate("en", "hello"), Some("Hello2"));
-        assert_eq!(combined.translate("zh-CN", "hello"), Some("你好2"));
+        let mut combined = backend.extend(backend2);
+        assert_eq!(combined.translate("en", "hello"), Some("Hello2".to_owned()));
+        assert_eq!(combined.translate("zh-CN", "hello"), Some("你好 2".to_owned()));
 
         assert_eq!(combined.available_locales(), vec!["en", "zh-CN"]);
+
+        let mut suitable = vec![];
+
+        combined.add("tr-TR", "hello from somewhere", "Buradan merhaba");
+
+        let locale = sys_locale::get_locale().unwrap();
+        for available in combined.available_locales() {
+            if locale.clone().contains(&available) {
+                suitable.push(available);
+            }
+        }
+
+        for available in combined.available_locales() {
+            if locale.clone().starts_with(&available) {
+                suitable.push(available);
+            }
+        }
+
+        let _default = suitable.first().unwrap_or(&"en".to_owned()).to_string();  
     }
 }

@@ -6,6 +6,8 @@ use std::path::PathBuf;
 mod backend;
 pub use backend::{Backend, BackendExt, SimpleBackend};
 
+pub use sys_locale::get_locale;
+
 type Locale = String;
 type Value = serde_json::Value;
 type Translations = HashMap<Locale, Value>;

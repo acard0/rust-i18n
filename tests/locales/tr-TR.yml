@@ -1,0 +1,6 @@
+greetings: Merhabalar!
+test_of: '{0} ve {1} testi'
+hello: Merhaba
+hellox: Merhaba {0}
+messages:
+  hello: Merhaba
