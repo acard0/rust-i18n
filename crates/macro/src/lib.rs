@@ -180,7 +180,7 @@ fn generate_code(
                 }
             }
 
-            return format!("{}.{}", locale, key);
+            key.to_owned()
         }
     
         #[inline]
