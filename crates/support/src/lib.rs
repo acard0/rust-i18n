@@ -3,12 +3,10 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::path::PathBuf;
 
-mod backend;
-mod error;
-
-pub use backend::{Backend, BackendExt, SimpleBackend};
-pub use error::*;
 pub use sys_locale::get_locale;
+pub use convert_case::*;
+pub mod backend;
+pub mod error;
 
 type Locale = String;
 type Value = serde_json::Value;
@@ -16,20 +14,6 @@ type Translations = HashMap<Locale, Value>;
 
 pub fn is_debug() -> bool {
     std::env::var("RUST_I18N_DEBUG").unwrap_or_else(|_| "0".to_string()) == "1"
-}
-
-/// Merge JSON Values, merge b into a
-fn merge_value(a: &mut Value, b: &Value) {
-    match (a, b) {
-        (Value::Object(a), Value::Object(b)) => {
-            for (k, v) in b {
-                merge_value(a.entry(k.clone()).or_insert(Value::Null), v);
-            }
-        }
-        (a, b) => {
-            *a = b.clone();
-        }
-    }
 }
 
 // Load locales into flatten key, value HashMap
@@ -95,6 +79,20 @@ pub fn load_locales<F: Fn(&str) -> bool>(
     });
 
     result
+}
+
+/// Merge JSON Values, merge b into a
+fn merge_value(a: &mut Value, b: &Value) {
+    match (a, b) {
+        (Value::Object(a), Value::Object(b)) => {
+            for (k, v) in b {
+                merge_value(a.entry(k.clone()).or_insert(Value::Null), v);
+            }
+        }
+        (a, b) => {
+            *a = b.clone();
+        }
+    }
 }
 
 // Parse Translations from file to support multiple formats

@@ -8,11 +8,10 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use rust_i18n::{t_add, t};
-    use rust_i18n_support::load_locales;
-    use crate::backend::I18n;
+    use crate::backend::*;
+    use rust_i18n::*;
 
-    rust_i18n::i18n!("tests/locales", fallback = "en-US", backend = I18n::new());
+    i18n!("tests/locales", fallback = "en-US", backend = I18n::new());
 
     #[test]
     fn test_load_all() {

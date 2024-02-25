@@ -1,5 +1,7 @@
 use std::{collections::HashMap, sync::{Mutex, Arc}};
 
+use rust_i18n::backend::*;
+
 #[derive(Debug, Clone)]
 pub struct I18n {
     inner: I18nHolder,
@@ -19,7 +21,7 @@ impl I18n {
     }
 }
 
-impl rust_i18n::Backend for I18n {
+impl Backend for I18n {
     fn available_locales(&self) -> Vec<String> {
         self.trs.lock().unwrap().keys().cloned().collect()
     }

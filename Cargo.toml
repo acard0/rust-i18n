@@ -15,7 +15,7 @@ version = "2.0.1-x"
 [dependencies]
 rust-i18n-extract = {path = "./crates/extract", optional = true}
 rust-i18n-support = {path = "./crates/support"}
-rust-i18n-macro = {path = "./crates/macro"}
+rust-i18n-macros = {path = "./crates/macros"}
 anyhow = {version = "1", optional = true}
 clap = {version = "4.3", optional = true, features = ["cargo"]}
 itertools = {version = "0.12", optional = true}
@@ -46,6 +46,6 @@ required-features = ["default"]
 members = [
     "crates/extract",
     "crates/support",
-    "crates/macro",
+    "crates/macros",
     "tests"
 ]
