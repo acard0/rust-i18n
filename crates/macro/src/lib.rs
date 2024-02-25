@@ -198,8 +198,8 @@ fn generate_code(
     }
 }
 
-#[proc_macro]
-pub fn as_details(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+#[proc_macro_derive(AsDetails)]
+pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(input as DeriveInput);
 
     let name = &ast.ident;
