@@ -207,6 +207,8 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
     let impl_block = quote! {
         impl AsDetails for #name {
             fn get_message_key(&self) -> String {
+                use convert_case::*;
+                
                 let name = stringify!(#name).to_case(Case::Kebab);
                 let inner = self.to_string();
                 format!("{}.{}", &name, &inner)
@@ -217,6 +219,8 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
             }
             
             fn as_details(&self) -> ErrorDetails {
+                use convert_case::*;
+
                 let name = stringify!(#name).to_case(Case::Kebab);
                 let message_key = self.get_message_key();
                 let suggestion_key = self.get_suggestion_key();
