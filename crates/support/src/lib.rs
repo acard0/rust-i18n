@@ -4,9 +4,7 @@ use std::io::prelude::*;
 use std::path::PathBuf;
 
 pub use sys_locale::get_locale;
-pub use convert_case::*;
 pub mod backend;
-pub mod error;
 
 type Locale = String;
 type Value = serde_json::Value;

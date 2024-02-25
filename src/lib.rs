@@ -4,11 +4,12 @@
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 
+pub mod error;
+
 #[doc(hidden)]
 pub use once_cell;
 pub use rust_i18n_macros::*;
 pub use rust_i18n_support::*;
-pub use rust_i18n_support::error::*;
 pub use rust_i18n_support::backend::*;
 
 static CURRENT_LOCALE: Lazy<Mutex<String>> = Lazy::new(|| {

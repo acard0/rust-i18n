@@ -171,16 +171,16 @@ fn generate_code(
             let mut backend = _RUST_I18N_BACKEND.lock().unwrap();
 
             if let Some(value) = backend.translate(locale, key) {
-                return value.to_string();
+                return value.to_owned();
             }
 
             if let Some(fallback) = _RUST_I18N_FALLBACK_LOCALE {
                 if let Some(value) = backend.translate(fallback, key) {
-                    return value.to_string();
+                    return value.to_owned();
                 }
             }
 
-            key.to_owned()
+            format!("{}.{}", locale.to_owned(), key.to_owned())
         }
     
         #[inline]

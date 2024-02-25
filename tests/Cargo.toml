@@ -7,5 +7,3 @@ edition = "2021"
 
 [dependencies]
 rust-i18n = { path = "../../rust-i18n" }
-strum = { version = "0.26", features = ["derive"] }
-thiserror = "1"
