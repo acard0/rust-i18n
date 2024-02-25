@@ -6,10 +6,8 @@ use std::sync::Mutex;
 
 #[doc(hidden)]
 pub use once_cell;
-pub use rust_i18n_macro::{i18n, AsDetails};
+pub use rust_i18n_macro::{i18n, as_details};
 pub use rust_i18n_support::{get_locale, Backend, BackendExt, SimpleBackend};
-
-pub mod error;
 
 static CURRENT_LOCALE: Lazy<Mutex<String>> = Lazy::new(|| {
     get_locale()

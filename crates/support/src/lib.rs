@@ -4,8 +4,10 @@ use std::io::prelude::*;
 use std::path::PathBuf;
 
 mod backend;
-pub use backend::{Backend, BackendExt, SimpleBackend};
+mod error;
 
+pub use backend::{Backend, BackendExt, SimpleBackend};
+pub use error::*;
 pub use sys_locale::get_locale;
 
 type Locale = String;

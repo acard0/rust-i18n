@@ -198,8 +198,8 @@ fn generate_code(
     }
 }
 
-#[proc_macro_derive(AsDetails)]
-pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+#[proc_macro]
+pub fn as_details(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let ast = syn::parse_macro_input!(input as DeriveInput);
 
     let name = &ast.ident;
@@ -217,7 +217,7 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
                 format!("{}.suggestion", self.get_message_key())
             }
             
-            fn as_details(&self) -> ErrorDetails {
+            fn as_details(&self) -> rust_i18n_support::error::ErrorDetails {
                 use convert_case::{Case, Casing};
                 let name = stringify!(#name).to_case(Case::Kebab);
                 let message_key = self.get_message_key();
@@ -231,7 +231,7 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
                     false => None
                 };
 
-                ErrorDetails::new(&name, &message, suggestion)
+                rust_i18n_support::error::ErrorDetails::new(&name, &message, suggestion)
             }
         }
 
@@ -239,7 +239,7 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
             fn from(value: #name) -> Self {
                 use convert_case::*;
                 let details = value.as_details();
-                Error::new(value, details)
+                rust_i18n_support::error::Error::new(value, details)
             }
         }
     };
