@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use clap::builder::Str;
+
 #[derive(thiserror::Error, Debug)]
 pub struct Error {
     source: Repr,
@@ -13,6 +15,7 @@ pub struct Repr {
 
 #[derive(Debug, Clone)]
 pub struct ErrorDetails {
+    pub display: String,
     pub name: String,
     pub fullname: String,
     pub message: String,
@@ -49,8 +52,8 @@ impl Repr {
 }
 
 impl ErrorDetails {
-    pub fn new(name: &str, fullname: &str, message: &str, suggestion: Option<String>) -> Self {
-        Self { name: name.to_owned(), fullname: fullname.to_owned(), message: message.to_string(), suggestion }
+    pub fn new(display: &str, name: &str, fullname: &str, message: &str, suggestion: Option<String>) -> Self {
+        Self { display: display.to_owned(), name: name.to_owned(), fullname: fullname.to_owned(), message: message.to_string(), suggestion }
     }
 }
 
