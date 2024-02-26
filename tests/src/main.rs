@@ -27,10 +27,10 @@ mod tests {
         t_add!("zh-CN", "foo", "Foo bar");
         t_add!("zh-CN", "hello", "你好");
 
-        println!("locale: {}", rust_i18n::locale());
+        println!("current locale: {}, {}", rust_i18n::locale(), t!("greetings"));
 
-        rust_i18n::set_locale("en");
-        
+        rust_i18n::set_locale("en-US");
+
         assert_eq!(t!("hello"), "Hello");
         assert_eq!(t!("greetings"), "Greetings!");
         assert_eq!(t!("foo"), format!("{}.{}", rust_i18n::locale(), "foo"));
@@ -52,6 +52,7 @@ mod tests {
 
         rust_i18n::set_locale("tr-TR");
         assert_eq!(rust_i18n::locale(), "tr-TR".to_owned());
+        println!("forced locale: {}", rust_i18n::locale());
 
         let t = t!("test_of", locale = "en", "a", "b");
         assert_eq!(t, "Test of a and b");
