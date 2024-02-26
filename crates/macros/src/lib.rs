@@ -239,7 +239,7 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
                     false => None
                 };
 
-                ErrorDetails::new(&display, &name, &fullname, &message, suggestion)
+                ErrorDetails::new(&display, &name, &fullname, &suggestion_key, &message, suggestion)
             }
         }
 

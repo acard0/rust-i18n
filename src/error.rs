@@ -17,6 +17,7 @@ pub struct ErrorDetails {
     pub display: String,
     pub name: String,
     pub fullname: String,
+    pub suggestion_key: String,
     pub message: String,
     pub suggestion: Option<String>,
 }
@@ -52,8 +53,8 @@ impl Repr {
 }
 
 impl ErrorDetails {
-    pub fn new(display: &str, name: &str, fullname: &str, message: &str, suggestion: Option<String>) -> Self {
-        Self { display: display.to_owned(), name: name.to_owned(), fullname: fullname.to_owned(), message: message.to_string(), suggestion }
+    pub fn new(display: &str, name: &str, fullname: &str, suggestion_key: &str, message: &str, suggestion: Option<String>) -> Self {
+        Self { display: display.to_owned(), name: name.to_owned(), fullname: fullname.to_owned(), suggestion_key: suggestion_key.to_owned(), message: message.to_string(), suggestion }
     }
 }
 
