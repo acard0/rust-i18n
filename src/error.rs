@@ -1,6 +1,5 @@
-use std::{convert, fmt::Display};
+use std::fmt::Display;
 
-use clap::builder::Str;
 
 #[derive(thiserror::Error, Debug)]
 pub struct Error {
@@ -26,7 +25,7 @@ pub trait AsDetails {
     fn as_details(&self) -> ErrorDetails;
     fn get_message_key(&self) -> String;
     fn get_suggestion_key(&self) -> String;
-    fn get_display(&self) -> String;
+    fn get_display_key(&self) -> String;
 }
 
 impl Error {
