@@ -210,12 +210,16 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
                 use convert_case::*;
                 
                 let name = stringify!(#name).to_case(Case::Kebab);
-                let inner = self.to_string();
-                format!("{}.{}", &name, &inner)
+                let display = self.get_display_key();
+                format!("{}.{}", &name, &display)
             }
 
             fn get_suggestion_key(&self) -> String {
                 format!("{}.suggestion", self.get_message_key())
+            }
+
+            fn get_display_key(&self) -> String {
+                self.to_string().to_case(Case::Kebab)
             }
             
             fn as_details(&self) -> ErrorDetails {

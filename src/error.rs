@@ -1,4 +1,4 @@
-use std::fmt::Display;
+use std::{convert, fmt::Display};
 
 use clap::builder::Str;
 
@@ -26,6 +26,7 @@ pub trait AsDetails {
     fn as_details(&self) -> ErrorDetails;
     fn get_message_key(&self) -> String;
     fn get_suggestion_key(&self) -> String;
+    fn get_display(&self) -> String;
 }
 
 impl Error {
