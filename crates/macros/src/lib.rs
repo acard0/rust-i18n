@@ -224,6 +224,7 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
                 let name = stringify!(#name).to_case(Case::Kebab);
                 let message_key = self.get_message_key();
                 let suggestion_key = self.get_suggestion_key();
+                let fullname = message_key.to_case(Case::Kebab);
         
                 let message = t!(&message_key);
                 let suggestion = t!(&suggestion_key);
@@ -233,7 +234,7 @@ pub fn derive_this_error(input: proc_macro::TokenStream) -> proc_macro::TokenStr
                     false => None
                 };
 
-                ErrorDetails::new(&name, &message, suggestion)
+                ErrorDetails::new(&name, &fullname, &message, suggestion)
             }
         }
 

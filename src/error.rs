@@ -14,6 +14,7 @@ pub struct Repr {
 #[derive(Debug, Clone)]
 pub struct ErrorDetails {
     pub name: String,
+    pub fullname: String,
     pub message: String,
     pub suggestion: Option<String>,
 }
@@ -48,8 +49,8 @@ impl Repr {
 }
 
 impl ErrorDetails {
-    pub fn new(name: &str, message: &str, suggestion: Option<String>) -> Self {
-        Self { name: name.to_owned(), message: message.to_string(), suggestion }
+    pub fn new(name: &str, fullname: &str, message: &str, suggestion: Option<String>) -> Self {
+        Self { name: name.to_owned(), fullname: fullname.to_owned(), message: message.to_string(), suggestion }
     }
 }
 
