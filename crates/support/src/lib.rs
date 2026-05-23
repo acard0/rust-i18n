@@ -106,6 +106,7 @@ fn parse_file(content: &str, ext: &str, locale: &str) -> Result<Translations, St
     };
 
     match result {
+        Ok(Value::Null) => Err("Empty translation file".into()),
         Ok(v) => Ok(Translations::from([(locale.to_string(), v)])),
         Err(e) => Err(e),
     }

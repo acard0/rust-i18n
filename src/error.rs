@@ -1,6 +1,5 @@
 use std::fmt::Display;
 
-
 #[derive(thiserror::Error, Debug)]
 pub struct Error {
     source: Repr,
@@ -31,16 +30,23 @@ pub trait AsDetails {
 
 impl Error {
     pub fn new(source: impl std::error::Error + 'static, details: ErrorDetails) -> Self {
-        Self { 
-            source: Repr::new(source), 
-            details
+        Self {
+            source: Repr::new(source),
+            details,
+        }
+    }
+
+    pub fn new_from_str(cause: &str, details: ErrorDetails) -> Self {
+        Self {
+            source: Repr::new(std::io::Error::other(cause.to_owned())),
+            details,
         }
     }
 
     pub fn get_details(&self) -> &ErrorDetails {
         &self.details
     }
-    
+
     pub fn get_source(&self) -> &dyn std::error::Error {
         &*self.source.source
     }
@@ -48,13 +54,33 @@ impl Error {
 
 impl Repr {
     pub fn new(source: impl std::error::Error + 'static) -> Self {
-        Self { source: Box::new(source) }
+        Self {
+            source: Box::new(source),
+        }
+    }
+
+    pub fn boxed(source: Box<dyn std::error::Error>) -> Self {
+        Self { source }
     }
 }
 
 impl ErrorDetails {
-    pub fn new(display: &str, name: &str, fullname: &str, suggestion_key: &str, message: &str, suggestion: Option<String>) -> Self {
-        Self { display: display.to_owned(), name: name.to_owned(), fullname: fullname.to_owned(), suggestion_key: suggestion_key.to_owned(), message: message.to_string(), suggestion }
+    pub fn new(
+        display: &str,
+        name: &str,
+        fullname: &str,
+        suggestion_key: &str,
+        message: &str,
+        suggestion: Option<String>,
+    ) -> Self {
+        Self {
+            display: display.to_owned(),
+            name: name.to_owned(),
+            fullname: fullname.to_owned(),
+            suggestion_key: suggestion_key.to_owned(),
+            message: message.to_string(),
+            suggestion,
+        }
     }
 }
 

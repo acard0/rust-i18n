@@ -89,11 +89,7 @@ impl SimpleBackend {
 
 impl Backend for SimpleBackend {
     fn available_locales(&self) -> Vec<String> {
-        let mut locales = self
-            .translations
-            .keys()
-            .cloned()
-            .collect::<Vec<_>>();
+        let mut locales = self.translations.keys().cloned().collect::<Vec<_>>();
         locales.sort();
         locales
     }
@@ -107,7 +103,9 @@ impl Backend for SimpleBackend {
     }
 
     fn add(&mut self, locale: &str, key: &str, value: &str) {
-        let locale = self.translations.entry(locale.to_string())
+        let locale = self
+            .translations
+            .entry(locale.to_string())
             .or_insert_with(HashMap::new);
 
         locale.insert(key.to_string(), value.to_string());
@@ -139,7 +137,10 @@ mod tests {
         assert_eq!(backend.translate("en", "hello"), Some("Hello".to_owned()));
         assert_eq!(backend.translate("en", "foo"), Some("Foo bar".to_owned()));
         assert_eq!(backend.translate("zh-CN", "hello"), Some("你好".to_owned()));
-        assert_eq!(backend.translate("zh-CN", "foo"), Some("Foo 测试".to_owned()));
+        assert_eq!(
+            backend.translate("zh-CN", "foo"),
+            Some("Foo 测试".to_owned())
+        );
 
         assert_eq!(backend.available_locales(), vec!["en", "zh-CN"]);
     }
@@ -168,7 +169,10 @@ mod tests {
 
         let mut combined = backend.extend(backend2);
         assert_eq!(combined.translate("en", "hello"), Some("Hello2".to_owned()));
-        assert_eq!(combined.translate("zh-CN", "hello"), Some("你好 2".to_owned()));
+        assert_eq!(
+            combined.translate("zh-CN", "hello"),
+            Some("你好 2".to_owned())
+        );
 
         assert_eq!(combined.available_locales(), vec!["en", "zh-CN"]);
 
@@ -189,6 +193,6 @@ mod tests {
             }
         }
 
-        let _default = suitable.first().unwrap_or(&"en".to_owned()).to_string();  
+        let _default = suitable.first().unwrap_or(&"en".to_owned()).to_string();
     }
 }

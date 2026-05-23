@@ -10,9 +10,9 @@ mod config;
 extern crate serde_derive;
 
 const APP_NAME: &str = "rust-i18n";
-const ABOUT: &str = r#"Rust I18n command for help you simply to extract all untranslated texts from soruce code.
+const ABOUT: &str = r#"Rust I18n command for help you simply to extract all untranslated texts from source code.
 
-It will iter all Rust files in and extract all untranslated texts that used `t!` macro.
+It will iter all Rust files in and extract all untranslated texts that use the `t!` macro.
 And then generate a YAML file and merge for existing texts.
 
 https://github.com/longbridgeapp/rust-i18n
@@ -20,7 +20,7 @@ https://github.com/longbridgeapp/rust-i18n
 
 fn main() -> Result<(), Error> {
     let extract_command = Command::new("i18n")
-        .about("Extract all untranslated I18n texts from soruce code")
+        .about("Extract all untranslated I18n texts from source code")
         .version(clap::crate_version!())
         .arg(
             Arg::new("source")
@@ -39,7 +39,9 @@ fn main() -> Result<(), Error> {
     #[allow(clippy::single_match)]
     match app.subcommand() {
         Some(("i18n", sub_m)) => {
-            let source_path = sub_m.get_one::<String>("source").expect("Missing source path");
+            let source_path = sub_m
+                .get_one::<String>("source")
+                .expect("Missing source path");
 
             let cfg = config::load(std::path::Path::new(source_path))?;
 
@@ -70,5 +72,3 @@ fn main() -> Result<(), Error> {
 
     Ok(())
 }
-
-

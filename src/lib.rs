@@ -9,8 +9,8 @@ pub mod error;
 #[doc(hidden)]
 pub use once_cell;
 pub use rust_i18n_macros::*;
-pub use rust_i18n_support::*;
 pub use rust_i18n_support::backend::*;
+pub use rust_i18n_support::*;
 
 static CURRENT_LOCALE: Lazy<Mutex<String>> = Lazy::new(|| {
     get_locale()
@@ -130,7 +130,7 @@ macro_rules! t {
             $vals
         )
     }};
-    
+
     // t!("foo", "bar", "baz")
     ($key:expr, $( $x:expr ),*) => {{
         rust_i18n::t!(
@@ -154,7 +154,6 @@ macro_rules! available_locales {
         _rust_i18n_available_locales()
     };
 }
-
 
 #[macro_export]
 #[allow(clippy::crate_in_macro_def)]

@@ -1,4 +1,7 @@
-use std::{collections::HashMap, sync::{Mutex, Arc}};
+use std::{
+    collections::HashMap,
+    sync::{Arc, Mutex},
+};
 
 use rust_i18n::backend::*;
 
@@ -17,7 +20,9 @@ impl std::ops::Deref for I18n {
 
 impl I18n {
     pub fn new() -> Self {
-        Self { inner: I18nHolder::new() }
+        Self {
+            inner: I18nHolder::new(),
+        }
     }
 }
 
@@ -32,8 +37,7 @@ impl Backend for I18n {
 
     fn add(&mut self, locale: &str, key: &str, value: &str) {
         let mut trs = self.trs.lock().unwrap();
-        let locale = trs.entry(locale.to_string())
-            .or_insert_with(HashMap::new);
+        let locale = trs.entry(locale.to_string()).or_insert_with(HashMap::new);
 
         locale.insert(key.to_string(), value.to_string());
     }
@@ -46,8 +50,8 @@ pub struct I18nHolder {
 
 impl I18nHolder {
     pub fn new() -> Self {
-        Self { 
-            trs: Arc::new(Mutex::new(HashMap::new()))
+        Self {
+            trs: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 }

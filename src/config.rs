@@ -137,10 +137,29 @@ fn test_load_default() {
 
 #[test]
 fn test_load() {
-    let workdir = Path::new(env!["CARGO_MANIFEST_DIR"]);
-    let cargo_root = workdir.join("examples/foo");
+    let workdir = std::env::temp_dir().join(format!(
+        "rust-i18n-config-test-{}-{}",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    let cargo_root = workdir.join("foo");
+    fs::create_dir_all(&cargo_root).unwrap();
+    fs::write(
+        cargo_root.join("Cargo.toml"),
+        r#"
+        [package.metadata.i18n]
+        default-locale = "en"
+        available-locales = ["zh-CN"]
+        "#,
+    )
+    .unwrap();
 
     let cfg = load(&cargo_root).unwrap();
     assert_eq!(cfg.default_locale, "en");
     assert_eq!(cfg.available_locales, vec!["en", "zh-CN"]);
+
+    fs::remove_dir_all(workdir).unwrap();
 }

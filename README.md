@@ -37,7 +37,7 @@ Add crate dependencies in your Cargo.toml and setup I18n config:
 
 ```toml
 [dependencies]
-rust-i18n = "1"
+rust-i18n = "2"
 ```
 
 Load macro and init translations in `lib.rs`
@@ -291,7 +291,7 @@ Run `cargo i18n -h` to see details.
 $ cargo i18n -h
 cargo-i18n 0.5.0
 ---------------------------------------
-Rust I18n command for help you simply to extract all untranslated texts from soruce code.
+Rust I18n command for help you simply to extract all untranslated texts from source code.
 
 It will iter all Rust files in and extract all untranslated texts that used `t!` macro.
 And then generate a YAML file and merge for existing texts.

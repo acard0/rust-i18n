@@ -2,16 +2,14 @@
 
 mod backend;
 
-fn main() {
-
-}
+fn main() {}
 
 #[cfg(test)]
 mod tests {
     use crate::backend::*;
     use rust_i18n::*;
 
-    i18n!("tests/locales", fallback = "en-US", backend = I18n::new());
+    i18n!("locales", fallback = "en-US", backend = I18n::new());
 
     #[test]
     fn test_load_all() {
@@ -20,29 +18,42 @@ mod tests {
             println!("{}: {:?}", locale, trs);
         }
     }
-    
+
+    #[test]
+    fn fallback_locale_is_used() {
+        rust_i18n::set_locale("tr-TR");
+
+        t_add!("en-US", "fallback.only", "From fallback");
+
+        assert_eq!(t!("fallback.only"), "From fallback");
+    }
+
     #[test]
     fn basic() {
         t_add!("en", "hello", "Hello");
         t_add!("zh-CN", "foo", "Foo bar");
         t_add!("zh-CN", "hello", "你好");
 
-        println!("current locale: {}, {}", rust_i18n::locale(), t!("greetings"));
+        println!(
+            "current locale: {}, {}",
+            rust_i18n::locale(),
+            t!("greetings")
+        );
 
         rust_i18n::set_locale("en-US");
 
         assert_eq!(t!("hello"), "Hello");
         assert_eq!(t!("greetings"), "Greetings!");
-        assert_eq!(t!("foo"), format!("{}.{}", rust_i18n::locale(), "foo"));
+        assert_eq!(t!("foo"), "foo");
         assert_eq!(t!("foo", locale = "zh-CN"), "Foo bar");
         assert_eq!(t!("hello", locale = "zh-CN"), "你好");
-             
+
         let t = t!("test_of", locale = "en", "a", "b");
         assert_eq!(t, "Test of a and b");
 
         let t = t!("test_of", locale = "tr-TR", "c", "d");
         assert_eq!(t, "c ve d testi");
-        
+
         let t = t!("test_of", vec!["e", "f"]);
         assert_eq!(t, "Test of e and f");
 
@@ -59,7 +70,7 @@ mod tests {
 
         let t = t!("test_of", locale = "tr-TR", "c", "d");
         assert_eq!(t, "c ve d testi");
-        
+
         let t = t!("test_of", vec!["e", "f"]);
         assert_eq!(t, "e ve f testi");
 
@@ -78,5 +89,4 @@ mod tests {
         let t = t!("hellox", [c]);
         assert_eq!(t, "Merhaba k");
     }
-
 }
