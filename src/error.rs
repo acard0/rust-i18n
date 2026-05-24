@@ -78,7 +78,7 @@ impl ErrorDetails {
             name: name.to_owned(),
             fullname: fullname.to_owned(),
             suggestion_key: suggestion_key.to_owned(),
-            message: message.to_string(),
+            message: message.to_owned(),
             suggestion,
         }
     }
